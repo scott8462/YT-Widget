@@ -45,7 +45,7 @@
   // ─── Constants ─────────────────────────────────────────────────────────────
   const YT_API_BASE = 'https://www.googleapis.com/youtube/v3';
   const WIDGET_ATTR = 'data-yt-widget';
-  const WIDGET_VERSION = '1.0.0';
+  const WIDGET_VERSION = '1.0.1';
 
   // ─── Stylesheet (injected once into <head>) ─────────────────────────────────
   const CSS = `
@@ -506,6 +506,58 @@
       .ytw-grid { grid-template-columns: 1fr; }
       .ytw-offline-last-thumb { display: none; }
     }
+
+    /* ── Floating Video Modal ── */
+    .ytw-modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+      z-index: 999999; display: flex; align-items: center; justify-content: center;
+      padding: 20px; animation: ytw-fadeIn 0.2s ease-out;
+    }
+    .ytw-modal-card {
+      position: relative; width: 100%; max-width: 900px;
+      background: #12121c; border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px; overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex; flex-direction: column;
+      animation: ytw-scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .ytw-modal-close {
+      position: absolute; top: 12px; right: 12px; z-index: 10;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; font-size: 20px; font-weight: 300; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .ytw-modal-close:hover {
+      background: rgba(255,0,51,0.9); border-color: transparent; transform: scale(1.1);
+    }
+    .ytw-modal-player {
+      position: relative; width: 100%; padding-top: 56.25%; background: #000;
+    }
+    .ytw-modal-player iframe {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;
+    }
+    .ytw-modal-footer {
+      padding: 16px 22px; display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; background: #181826; border-top: 1px solid rgba(255,255,255,0.08);
+      flex-wrap: wrap;
+    }
+    .ytw-modal-info { flex: 1; min-width: 200px; }
+    .ytw-modal-title { font-size: 15px; font-weight: 700; color: #ffffff; line-height: 1.4; }
+    .ytw-modal-yt-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px; background: #ff0033; color: #ffffff !important;
+      font-size: 13px; font-weight: 700; border-radius: 8px;
+      text-decoration: none !important; transition: all 0.2s; white-space: nowrap;
+    }
+    .ytw-modal-yt-btn:hover {
+      background: #cc0029; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(255,0,51,0.4);
+    }
+    .ytw-modal-yt-btn svg { width: 16px; height: 16px; fill: currentColor; }
+    @keyframes ytw-fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes ytw-scaleUp { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
   `;
 
   // ─── Utilities ──────────────────────────────────────────────────────────────
@@ -747,8 +799,9 @@
 
   // ─── Render: Grid Card ───────────────────────────────────────────────────────
   function renderGridCard(video) {
+    const titleEsc = encodeURIComponent(video.title || '');
     return `
-      <a class="ytw-card" href="${video.url}" target="_blank" rel="noopener" aria-label="${video.title}">
+      <a class="ytw-card" href="${video.url}" data-video-id="${video.id}" data-video-title="${titleEsc}" target="_blank" rel="noopener" aria-label="${video.title}">
         <div class="ytw-thumb-wrap">
           <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
           <div class="ytw-play-btn">${ICONS.play}</div>
@@ -767,8 +820,9 @@
 
   // ─── Render: List Item ───────────────────────────────────────────────────────
   function renderListItem(video) {
+    const titleEsc = encodeURIComponent(video.title || '');
     return `
-      <a class="ytw-list-item" href="${video.url}" target="_blank" rel="noopener" aria-label="${video.title}">
+      <a class="ytw-list-item" href="${video.url}" data-video-id="${video.id}" data-video-title="${titleEsc}" target="_blank" rel="noopener" aria-label="${video.title}">
         <div class="ytw-list-thumb">
           <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
           ${video.duration ? `<span class="ytw-duration">${video.duration}</span>` : ''}
@@ -879,7 +933,7 @@
     const lastVideoHtml = (showLastVideo && lastVideo) ? `
       <div class="ytw-offline-last">
         <div class="ytw-offline-last-label">Last Video</div>
-        <a class="ytw-offline-last-video" href="${lastVideo.url}" target="_blank" rel="noopener">
+        <a class="ytw-offline-last-video" href="${lastVideo.url}" data-video-id="${lastVideo.id}" data-video-title="${encodeURIComponent(lastVideo.title || '')}" target="_blank" rel="noopener">
           <div class="ytw-offline-last-thumb">
             <img src="${lastVideo.thumbnail}" alt="${lastVideo.title}" loading="lazy">
             ${lastVideo.duration ? `<span class="ytw-duration">${lastVideo.duration}</span>` : ''}
@@ -1132,9 +1186,75 @@
         });
       }
 
+      // Attach click event listener for Floating Modal Player
+      if (!el.dataset.modalListenerAttached) {
+        el.dataset.modalListenerAttached = 'true';
+        el.addEventListener('click', (e) => {
+          const card = e.target.closest('a[data-video-id]');
+          if (card) {
+            if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
+            e.preventDefault();
+            const videoId = card.dataset.videoId;
+            const videoTitle = card.dataset.videoTitle ? decodeURIComponent(card.dataset.videoTitle) : card.getAttribute('aria-label');
+            const videoUrl = card.href;
+            openVideoModal(videoId, videoTitle, videoUrl);
+          }
+        });
+      }
+
     } catch (err) {
       console.error('[YT Widget]', err);
       showError(el, err.message || 'An unexpected error occurred.');
+    }
+  }
+
+  // ─── Floating Video Modal ────────────────────────────────────────────────────
+  function openVideoModal(videoId, title, url) {
+    closeVideoModal();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'ytw-modal-overlay';
+    overlay.id = 'ytw-active-modal';
+
+    const cleanTitle = title || 'Watch Video';
+    const ytUrl = url || `https://www.youtube.com/watch?v=${videoId}`;
+
+    overlay.innerHTML = `
+      <div class="ytw-modal-card" onclick="event.stopPropagation()">
+        <button class="ytw-modal-close" aria-label="Close modal" onclick="window.YTWidget.closeModal()">&times;</button>
+        <div class="ytw-modal-player">
+          <iframe
+            src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0"
+            allowfullscreen
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            title="${cleanTitle}">
+          </iframe>
+        </div>
+        <div class="ytw-modal-footer">
+          <div class="ytw-modal-info">
+            <div class="ytw-modal-title">${cleanTitle}</div>
+          </div>
+          <a class="ytw-modal-yt-btn" href="${ytUrl}" target="_blank" rel="noopener">
+            ${ICONS.youtube} Open on YouTube ↗
+          </a>
+        </div>
+      </div>
+    `;
+
+    overlay.addEventListener('click', () => closeVideoModal());
+    document.body.appendChild(overlay);
+    window.addEventListener('keydown', handleModalEscKey);
+  }
+
+  function handleModalEscKey(e) {
+    if (e.key === 'Escape') closeVideoModal();
+  }
+
+  function closeVideoModal() {
+    const modal = document.getElementById('ytw-active-modal');
+    if (modal) {
+      modal.remove();
+      window.removeEventListener('keydown', handleModalEscKey);
     }
   }
 
@@ -1152,6 +1272,12 @@
   }
 
   // Expose public API
-  window.YTWidget = { version: WIDGET_VERSION, reinit: bootstrap, init: initWidget };
+  window.YTWidget = {
+    version: WIDGET_VERSION,
+    reinit: bootstrap,
+    init: initWidget,
+    openModal: openVideoModal,
+    closeModal: closeVideoModal
+  };
 
 })();
