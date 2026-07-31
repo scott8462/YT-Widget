@@ -1,0 +1,35 @@
+# Apache .htaccess — Protect config.php and cache/ from direct web access
+
+# Block direct browser access to config.php
+<Files "config.php">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Block access to cache directory
+<IfModule mod_authz_core.c>
+    # Apache 2.4+
+    <DirectoryMatch "cache">
+        Require all denied
+    </DirectoryMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+    # Apache 2.2
+    <DirectoryMatch "cache">
+        Order allow,deny
+        Deny from all
+    </DirectoryMatch>
+</IfModule>
+
+# Prevent PHP execution inside cache/ (extra hardening)
+<FilesMatch "\.json$">
+    <IfModule mod_php.c>
+        php_flag engine off
+    </IfModule>
+</FilesMatch>
+
+# Only api-proxy.php is publicly callable
+<FilesMatch "^(?!api-proxy\.php).*\.php$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

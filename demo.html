@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo — YT Widget Embedded Example</title>
+  <meta name="description" content="This is a demo page showing how YT Widget looks when embedded on a regular website.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ── Fake website styles (not YT Widget styles) ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0c0c18;
+      color: #e8e8f0;
+      line-height: 1.6;
+    }
+
+    /* Fake Nav */
+    .fake-nav {
+      background: #111120;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 0 40px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .fake-nav-logo { font-size: 18px; font-weight: 800; color: #fff; }
+    .fake-nav-links { display: flex; gap: 24px; }
+    .fake-nav-links a { color: #8888aa; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+    .fake-nav-links a:hover { color: #fff; }
+
+    /* Fake Hero */
+    .fake-hero {
+      background: linear-gradient(135deg, #1a0a2e 0%, #0d1a3d 50%, #0a1a0a 100%);
+      padding: 70px 40px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .fake-hero h1 { font-size: 46px; font-weight: 900; letter-spacing: -1.5px; margin-bottom: 14px; }
+    .fake-hero h1 span { color: #7c3aed; }
+    .fake-hero p { color: #8888aa; font-size: 16px; max-width: 500px; margin: 0 auto; }
+
+    /* Main content */
+    .fake-main { max-width: 1200px; margin: 0 auto; padding: 60px 40px; }
+
+    /* Section heading */
+    .section-heading {
+      margin-bottom: 28px;
+    }
+    .section-heading .label {
+      display: inline-block; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: #ff0033; margin-bottom: 8px;
+    }
+    .section-heading h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+    .section-heading p { color: #8888aa; font-size: 15px; margin-top: 6px; }
+
+    /* Two-column blog section below widget */
+    .fake-blog { margin-top: 80px; }
+    .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .blog-card {
+      background: #131320; border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px; overflow: hidden; transition: transform 0.2s;
+    }
+    .blog-card:hover { transform: translateY(-3px); }
+    .blog-thumb {
+      height: 160px;
+      background: linear-gradient(135deg, #1e1e40, #2a1540);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 40px;
+    }
+    .blog-body { padding: 16px; }
+    .blog-tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #7c3aed; margin-bottom: 8px; display: block; }
+    .blog-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; }
+    .blog-meta { font-size: 12px; color: #8888aa; }
+
+    /* Fake footer */
+    .fake-footer {
+      border-top: 1px solid rgba(255,255,255,0.07);
+      padding: 32px 40px; text-align: center;
+      color: #55556a; font-size: 13px; background: #0a0a14;
+    }
+
+    /* Demo banner */
+    .demo-banner {
+      background: linear-gradient(90deg, rgba(255,0,51,0.15), rgba(124,58,237,0.15));
+      border-bottom: 1px solid rgba(255,0,51,0.25);
+      padding: 10px 24px;
+      display: flex; align-items: center; justify-content: center; gap: 14px;
+      font-size: 13px; color: #ffaaaa; text-align: center;
+    }
+    .demo-banner strong { color: #ff6b6b; }
+    .demo-banner a { color: #ff6b6b; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <!-- Demo Banner -->
+  <div class="demo-banner">
+    👀 <strong>YT Widget Demo</strong> — This is a simulated customer website. The YouTube widget below is injected via a single &lt;script&gt; tag.
+    <a href="index.html">← Back to Builder</a>
+  </div>
+
+  <!-- Fake Nav -->
+  <nav class="fake-nav">
+    <div class="fake-nav-logo">🚀 TechBlog</div>
+    <div class="fake-nav-links">
+      <a href="#">Home</a>
+      <a href="#">Articles</a>
+      <a href="#">Videos</a>
+      <a href="#">About</a>
+    </div>
+  </nav>
+
+  <!-- Fake Hero -->
+  <div class="fake-hero">
+    <h1>Your Favorite <span>Tech</span> Blog</h1>
+    <p>Articles, tutorials, and video content about modern web development, AI, and design.</p>
+  </div>
+
+  <!-- Main Content -->
+  <main class="fake-main">
+
+    <!-- ██ YT WIDGET SECTION ██ -->
+    <div class="section-heading">
+      <span class="label">📺 Video Content</span>
+      <h2>Latest from Our Channel</h2>
+      <p>Watch our newest tutorials and deep dives — updated automatically.</p>
+    </div>
+
+    <!--
+      ╔══════════════════════════════════════════════════════╗
+      ║  PASTE YOUR EMBED CODE HERE (replace the example)   ║
+      ╚══════════════════════════════════════════════════════╝
+
+      Example below uses placeholder values. Replace with your
+      real data-channel-id and data-api-key from the builder.
+    -->
+
+    <!-- Grid Feed Widget (dark theme) -->
+    <div
+      data-yt-widget
+      data-channel-id="YOUR_CHANNEL_ID"
+      data-api-key="YOUR_API_KEY"
+      data-type="feed"
+      data-layout="grid"
+      data-theme="dark"
+      data-max-results="6"
+      data-accent-color="#7c3aed">
+    </div>
+
+    <!-- ── Channel Stats Widget below the feed ── -->
+    <div style="margin-top: 40px;">
+      <div class="section-heading">
+        <span class="label">📊 Channel Stats</span>
+        <h2>By the Numbers</h2>
+      </div>
+
+      <div
+        data-yt-widget
+        data-channel-id="YOUR_CHANNEL_ID"
+        data-api-key="YOUR_API_KEY"
+        data-type="stats"
+        data-theme="dark"
+        data-accent-color="#ff0033"
+        data-show-channel-info="false">
+      </div>
+    </div>
+
+    <!-- Fake Blog Section -->
+    <div class="fake-blog">
+      <div class="section-heading">
+        <span class="label">📝 Latest Articles</span>
+        <h2>From the Blog</h2>
+        <p>Written guides to complement our video content.</p>
+      </div>
+      <div class="blog-grid">
+        <div class="blog-card">
+          <div class="blog-thumb">🤖</div>
+          <div class="blog-body">
+            <span class="blog-tag">AI</span>
+            <div class="blog-title">Getting Started with Large Language Models in 2025</div>
+            <div class="blog-meta">July 28, 2025 · 8 min read</div>
+          </div>
+        </div>
+        <div class="blog-card">
+          <div class="blog-thumb">⚡</div>
+          <div class="blog-body">
+            <span class="blog-tag">Performance</span>
+            <div class="blog-title">Web Performance Optimization: The Definitive Guide</div>
+            <div class="blog-meta">July 22, 2025 · 12 min read</div>
+          </div>
+        </div>
+        <div class="blog-card">
+          <div class="blog-thumb">🎨</div>
+          <div class="blog-body">
+            <span class="blog-tag">Design</span>
+            <div class="blog-title">Glassmorphism in 2025: When to Use It (and When Not To)</div>
+            <div class="blog-meta">July 15, 2025 · 6 min read</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Fake Footer -->
+  <footer class="fake-footer">
+    © 2025 TechBlog. All rights reserved. YouTube widgets powered by <strong>YT Widget</strong>.
+  </footer>
+
+  <!-- ██ YT WIDGET SCRIPT ██ -->
+  <!-- This is the only script you need — place before </body> -->
+  <script src="yt-widget.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YT Widget Builder — Embed YouTube on Any Website</title>
+  <meta name="description" content="Generate a custom YouTube widget embed code for your website. Display video feeds, stats, playlists and more — no coding required.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- ── Header ── -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.8 8s-.2-1.4-.8-2c-.76-.8-1.61-.8-2-.85C16.2 5 12 5 12 5s-4.2 0-7 .17c-.39.05-1.24.05-2 .85-.6.6-.8 2-.8 2S2 9.6 2 11.24v1.52c0 1.62.2 3.24.2 3.24s.2 1.38.8 1.98c.76.8 1.76.77 2.2.85C6.8 19 12 19 12 19s4.2 0 7-.18c.39-.04 1.24-.04 2-.84.6-.6.8-1.98.8-1.98S22 14.38 22 12.76v-1.52C22 9.6 21.8 8 21.8 8zM10 14.5v-5l5.5 2.5-5.5 2.5z"/></svg>
+        </div>
+        <div>
+          <div class="logo-name">YT Widget</div>
+          <div class="logo-tagline">Embed YouTube anywhere</div>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <a href="#builder" class="nav-link active">Builder</a>
+        <a href="demo.html" class="nav-link" target="_blank">Live Demo</a>
+        <a href="README.md" class="nav-link" target="_blank">Docs</a>
+        <a href="https://www.randsdevelopment.com" class="btn-outline" target="_blank" rel="noopener">
+          R&amp;S Development ↗
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── Hero ── -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Free & Open Source
+      </div>
+      <h1 class="hero-title">
+        Embed YouTube<br>
+        on <span class="hero-accent">Any Website</span>
+      </h1>
+      <p class="hero-sub">
+        One script tag. Zero dependencies. Beautiful, responsive YouTube widgets<br>
+        that work on any HTML page — just like SociableKIT, but self-hosted.
+      </p>
+      <div class="hero-chips">
+        <span class="chip">🎬 Video Feeds</span>
+        <span class="chip">📊 Channel Stats</span>
+        <span class="chip">🎵 Playlists</span>
+        <span class="chip">▶️ Single Player</span>
+        <span class="chip">🌗 Dark &amp; Light Themes</span>
+      </div>
+    </div>
+    <div class="hero-glow"></div>
+  </section>
+
+  <!-- ── Builder ── -->
+  <main id="builder" class="builder-layout">
+
+    <!-- Config Panel -->
+    <aside class="config-panel" id="config-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">⚙️ Configure Widget</h2>
+        <p class="panel-subtitle">Set your options and preview live →</p>
+      </div>
+
+      <!-- Proxy URL (recommended) -->
+      <div class="field-group">
+        <div class="field-label-row">
+          <label class="field-label" for="cfg-proxyurl">🔒 Proxy URL <span class="recommended-badge">Recommended</span></label>
+          <a class="field-help" href="README.md" target="_blank" rel="noopener">Docs ↗</a>
+        </div>
+        <input type="text" id="cfg-proxyurl" class="field-input" placeholder="https://yoursite.com/proxy/api-proxy.php">
+        <div class="field-hint">
+          Upload the <code>proxy/</code> folder to your server. Your API key stays server-side and is <strong>never visible</strong> to users.<br>
+          <span style="color:#f59e0b">⚠ For this live preview, enter the full <code>https://</code> URL. On your actual site you can use a relative path like <code>/proxy/api-proxy.php</code>.</span>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="field-divider">
+        <span>or use direct API key (visible in source)</span>
+      </div>
+
+      <!-- API Key -->
+      <div class="field-group">
+        <div class="field-label-row">
+          <label class="field-label" for="cfg-apikey">API Key <span class="field-label-sub">(client-side)</span></label>
+          <a class="field-help" href="https://console.cloud.google.com/" target="_blank" rel="noopener">Get key ↗</a>
+        </div>
+        <input type="text" id="cfg-apikey" class="field-input" placeholder="AIzaSy..." autocomplete="off">
+        <div class="field-hint">Only needed if not using a proxy. Restrict this key to your domain in Google Cloud Console.</div>
+      </div>
+
+      <!-- Widget Type -->
+      <div class="field-group">
+        <label class="field-label">Widget Type</label>
+        <div class="type-grid" id="type-grid">
+          <button class="type-btn active" data-type="feed" id="type-feed">
+            <span class="type-icon">📺</span>
+            <span class="type-name">Feed</span>
+            <span class="type-desc">Latest videos</span>
+          </button>
+          <button class="type-btn" data-type="stats" id="type-stats">
+            <span class="type-icon">📊</span>
+            <span class="type-name">Stats</span>
+            <span class="type-desc">Channel metrics</span>
+          </button>
+          <button class="type-btn" data-type="playlist" id="type-playlist">
+            <span class="type-icon">🎵</span>
+            <span class="type-name">Playlist</span>
+            <span class="type-desc">Playlist videos</span>
+          </button>
+          <button class="type-btn" data-type="single" id="type-single">
+            <span class="type-icon">▶️</span>
+            <span class="type-name">Single</span>
+            <span class="type-desc">One video + info</span>
+          </button>
+          <button class="type-btn" data-type="live" id="type-live" style="grid-column: 1 / -1;">
+            <span class="type-icon">🔴</span>
+            <span class="type-name">Live</span>
+            <span class="type-desc">Live stream or offline card</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Channel ID (shown for feed/stats/playlist) -->
+      <div class="field-group" id="field-channel">
+        <div class="field-label-row">
+          <label class="field-label" for="cfg-channelid">Channel ID <span class="required">*</span></label>
+          <a class="field-help" href="https://www.youtube.com/account_advanced" target="_blank" rel="noopener">Find ID ↗</a>
+        </div>
+        <input type="text" id="cfg-channelid" class="field-input" placeholder="UCxxxxxxxxxxxxxxx">
+        <div class="field-hint">Found in YouTube Studio → Settings → Channel → Advanced.</div>
+      </div>
+
+      <!-- Playlist ID (shown for playlist type) -->
+      <div class="field-group" id="field-playlist" style="display:none">
+        <label class="field-label" for="cfg-playlistid">Playlist ID <span class="required">*</span></label>
+        <input type="text" id="cfg-playlistid" class="field-input" placeholder="PLxxxxxxxxxxxxxxx">
+        <div class="field-hint">From the playlist URL: youtube.com/playlist?list=<strong>THIS_PART</strong></div>
+      </div>
+
+      <!-- Video ID (shown for single type) -->
+      <div class="field-group" id="field-video" style="display:none">
+        <label class="field-label" for="cfg-videoid">Video ID <span class="required">*</span></label>
+        <input type="text" id="cfg-videoid" class="field-input" placeholder="dQw4w9WgXcQ">
+        <div class="field-hint">From the video URL: youtube.com/watch?v=<strong>THIS_PART</strong></div>
+      </div>
+
+      <!-- Layout (for feed/playlist) -->
+      <div class="field-group" id="field-layout">
+        <label class="field-label">Layout</label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-layout="grid" id="layout-grid">⊞ Grid</button>
+          <button class="toggle-btn" data-layout="list" id="layout-list">☰ List</button>
+        </div>
+      </div>
+
+      <!-- Theme -->
+      <div class="field-group">
+        <label class="field-label">Theme</label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-theme="dark" id="theme-dark">🌙 Dark</button>
+          <button class="toggle-btn" data-theme="light" id="theme-light">☀️ Light</button>
+        </div>
+      </div>
+
+      <!-- 🎨 Color Customization -->
+      <div class="field-group">
+        <label class="field-label">🎨 Color Customization</label>
+
+        <!-- Button / Accent Color -->
+        <div class="subfield-group">
+          <label class="subfield-label" for="cfg-accent">Button / Accent Background</label>
+          <div class="color-row">
+            <input type="color" id="cfg-accent" class="color-picker" value="#ff0033">
+            <div class="color-presets">
+              <button class="preset-color active" data-color="#ff0033" style="background:#ff0033" title="YouTube Red"></button>
+              <button class="preset-color" data-color="#7c3aed" style="background:#7c3aed" title="Purple"></button>
+              <button class="preset-color" data-color="#0ea5e9" style="background:#0ea5e9" title="Sky Blue"></button>
+              <button class="preset-color" data-color="#10b981" style="background:#10b981" title="Emerald"></button>
+              <button class="preset-color" data-color="#ffffff" style="background:#ffffff; border:1px solid #666;" title="White"></button>
+              <button class="preset-color" data-color="#ec4899" style="background:#ec4899" title="Pink"></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Button Text Color -->
+        <div class="subfield-group">
+          <label class="subfield-label" for="cfg-btn-text">Button Text Color</label>
+          <div class="color-row">
+            <input type="color" id="cfg-btn-text" class="color-picker" value="#ffffff">
+            <div class="color-presets">
+              <button class="preset-btn-text active" data-color="#ffffff" style="background:#ffffff; border:1px solid #666" title="White Text"></button>
+              <button class="preset-btn-text" data-color="#111118" style="background:#111118" title="Dark Text"></button>
+              <button class="preset-btn-text" data-color="#ff0033" style="background:#ff0033" title="Red Text"></button>
+            </div>
+          </div>
+          <div class="field-hint">Text color for Subscribe &amp; Watch buttons.</div>
+        </div>
+
+        <!-- Widget Background Color -->
+        <div class="subfield-group">
+          <label class="subfield-label" for="cfg-bg-color">Widget Background</label>
+          <div class="color-row">
+            <input type="color" id="cfg-bg-color" class="color-picker" value="#0f0f13">
+            <span class="field-hint" style="margin:0">Main container background</span>
+          </div>
+        </div>
+
+        <!-- Card Background Color -->
+        <div class="subfield-group">
+          <label class="subfield-label" for="cfg-card-bg">Card Background</label>
+          <div class="color-row">
+            <input type="color" id="cfg-card-bg" class="color-picker" value="#1a1a24">
+            <span class="field-hint" style="margin:0">Video cards background</span>
+          </div>
+        </div>
+
+        <!-- Primary Text Color -->
+        <div class="subfield-group">
+          <label class="subfield-label" for="cfg-text-color">Primary Text Color</label>
+          <div class="color-row">
+            <input type="color" id="cfg-text-color" class="color-picker" value="#f0f0f0">
+            <span class="field-hint" style="margin:0">Titles &amp; headings text</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Max Results -->
+      <div class="field-group" id="field-maxresults">
+        <label class="field-label" for="cfg-max">Max Results (per page) <span class="count-badge" id="max-badge">9</span></label>
+        <input type="range" id="cfg-max" class="range-input" min="1" max="50" value="9">
+        <div class="range-labels"><span>1</span><span>50</span></div>
+      </div>
+
+      <!-- Load More Toggle & Text (for feed & playlist) -->
+      <div class="field-group" id="field-loadmore">
+        <label class="field-label">Enable "Load More" Button</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="cfg-loadmore" checked>
+          <span class="toggle-track">
+            <span class="toggle-thumb"></span>
+          </span>
+          <span class="toggle-label">Allow visitors to fetch &amp; append more videos</span>
+        </label>
+      </div>
+
+      <div class="field-group" id="field-loadmoretext">
+        <label class="field-label" for="cfg-loadmore-text">Load More Button Text</label>
+        <input type="text" id="cfg-loadmore-text" class="field-input" value="Load More Videos">
+      </div>
+
+      <!-- Show Channel Header -->
+      <div class="field-group" id="field-channelheader">
+        <label class="field-label">Show Channel Header</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="cfg-channelheader" checked>
+          <span class="toggle-track">
+            <span class="toggle-thumb"></span>
+          </span>
+          <span class="toggle-label">Show channel name, avatar &amp; subscribe button</span>
+        </label>
+      </div>
+
+      <!-- Offline Message (live type only) -->
+      <div class="field-group" id="field-offline-message" style="display:none">
+        <label class="field-label" for="cfg-offline-msg">Offline Message</label>
+        <input type="text" id="cfg-offline-msg" class="field-input" value="We're not live right now">
+        <div class="field-hint">Text shown when your channel is not streaming.</div>
+      </div>
+
+      <!-- Custom Offline Image (live type only) -->
+      <div class="field-group" id="field-offline-image" style="display:none">
+        <div class="field-label-row">
+          <label class="field-label" for="cfg-offline-img">Custom Offline Banner Image</label>
+          <button type="button" class="btn-use-template" id="btn-use-template-img">🖼 Use Sample Banner</button>
+        </div>
+        <input type="text" id="cfg-offline-img" class="field-input" placeholder="https://yoursite.com/offline-banner.jpg">
+        <div class="field-hint">
+          📐 <strong>Recommended Size:</strong> 16:9 ratio — <strong>1920×1080 px</strong> or <strong>1280×720 px</strong>.<br>
+          We included a sample <code>offline-banner.jpg</code> in your project folder!
+        </div>
+      </div>
+
+      <!-- Show Last Video (live type only) -->
+      <div class="field-group" id="field-showlastvideo" style="display:none">
+        <label class="field-label">Show Last Video in Offline Card</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="cfg-showlastvideo" checked>
+          <span class="toggle-track">
+            <span class="toggle-thumb"></span>
+          </span>
+          <span class="toggle-label">Show most recent upload below the offline message</span>
+        </label>
+      </div>
+
+      <!-- Preview Button -->
+      <button class="btn-preview" id="btn-preview" onclick="runPreview()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><polygon points="5,3 19,12 5,21"/></svg>
+        Generate Preview
+      </button>
+    </aside>
+
+    <!-- Preview + Embed Area -->
+    <section class="preview-area">
+      <div class="preview-topbar">
+        <div class="preview-label">Live Preview</div>
+        <div class="browser-dots">
+          <span class="bdot red"></span>
+          <span class="bdot yellow"></span>
+          <span class="bdot green"></span>
+        </div>
+        <div class="preview-url-bar">yourwebsite.com</div>
+      </div>
+      <div class="preview-frame" id="preview-frame">
+        <!-- Empty State -->
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon">▶</div>
+          <h3>Configure &amp; Preview</h3>
+          <p>Enter your API key and channel details,<br>then click <strong>Generate Preview</strong>.</p>
+          <div class="empty-steps">
+            <div class="step"><span class="step-num">1</span> Enter your YouTube API key</div>
+            <div class="step"><span class="step-num">2</span> Enter channel or video ID</div>
+            <div class="step"><span class="step-num">3</span> Click Generate Preview</div>
+            <div class="step"><span class="step-num">4</span> Copy the embed code</div>
+          </div>
+        </div>
+        <!-- Widget renders here -->
+        <div id="yt-preview-target" style="display:none"></div>
+      </div>
+
+      <!-- Embed Code -->
+      <div class="embed-section" id="embed-section" style="display:none">
+        <div class="embed-header">
+          <div class="embed-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Embed Code
+          </div>
+          <button class="btn-copy" id="btn-copy" onclick="copyEmbed()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy Code
+          </button>
+        </div>
+        <pre class="embed-code" id="embed-code"></pre>
+        <div class="embed-instructions">
+          <strong>How to use:</strong> Paste both the <code>&lt;div&gt;</code> and <code>&lt;script&gt;</code> tags into any HTML page where you want the widget to appear.
+          Host <code>yt-widget.js</code> on your server or CDN, then update the <code>src</code> path accordingly.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ── How It Works ── -->
+  <section class="how-section">
+    <div class="how-inner">
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-sub">Get a YouTube widget on your site in under 2 minutes.</p>
+      <div class="steps-row">
+        <div class="how-step">
+          <div class="how-num">01</div>
+          <div class="how-icon">🔑</div>
+          <h3>Get API Key</h3>
+          <p>Create a free YouTube Data API v3 key in Google Cloud Console. Takes about 60 seconds.</p>
+        </div>
+        <div class="how-arrow">→</div>
+        <div class="how-step">
+          <div class="how-num">02</div>
+          <div class="how-icon">⚙️</div>
+          <h3>Configure</h3>
+          <p>Enter your channel ID, choose a widget type, layout, and theme using the builder above.</p>
+        </div>
+        <div class="how-arrow">→</div>
+        <div class="how-step">
+          <div class="how-num">03</div>
+          <div class="how-icon">📋</div>
+          <h3>Copy Code</h3>
+          <p>Click "Copy Embed Code" to get your personalized snippet — one div, one script tag.</p>
+        </div>
+        <div class="how-arrow">→</div>
+        <div class="how-step">
+          <div class="how-num">04</div>
+          <div class="how-icon">🚀</div>
+          <h3>Paste &amp; Launch</h3>
+          <p>Paste into any HTML page — WordPress, Webflow, custom sites, anywhere. It just works.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Feature Cards ── -->
+  <section class="features-section">
+    <div class="features-inner">
+      <h2 class="section-title">Everything You Need</h2>
+      <div class="features-grid">
+        <div class="feat-card">
+          <div class="feat-icon">⚡</div>
+          <h3>Zero Dependencies</h3>
+          <p>Pure vanilla JavaScript. No jQuery, no React, no npm. Just one script tag and it works.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🎨</div>
+          <h3>Fully Themeable</h3>
+          <p>Dark and light themes built in. Custom accent colors. CSS variables for deep customization.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">📱</div>
+          <h3>Fully Responsive</h3>
+          <p>Grid and list layouts adapt beautifully from desktop down to mobile screens automatically.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🔒</div>
+          <h3>Self-Hosted</h3>
+          <p>Host yt-widget.js on your own server or CDN. No third-party services or hidden trackers.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🎬</div>
+          <h3>Multiple Widget Types</h3>
+          <p>Video feeds, channel stats, playlist grids, and single video embeds — all in one script.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-icon">🌍</div>
+          <h3>Universal Compatibility</h3>
+          <p>Works on any website — WordPress, Webflow, Framer, Squarespace, raw HTML. Everywhere.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M21.8 8s-.2-1.4-.8-2c-.76-.8-1.61-.8-2-.85C16.2 5 12 5 12 5s-4.2 0-7 .17c-.39.05-1.24.05-2 .85-.6.6-.8 2-.8 2S2 9.6 2 11.24v1.52c0 1.62.2 3.24.2 3.24s.2 1.38.8 1.98c.76.8 1.76.77 2.2.85C6.8 19 12 19 12 19s4.2 0 7-.18c.39-.04 1.24-.04 2-.84.6-.6.8-1.98.8-1.98S22 14.38 22 14.76v-1.52C22 9.6 21.8 8 21.8 8zM10 14.5v-5l5.5 2.5-5.5 2.5z"/></svg>
+        YT Widget
+      </div>
+      <p class="footer-note">Open source. Built with ❤️ and vanilla JavaScript.</p>
+    </div>
+  </footer>
+
+  <script src="yt-widget.js"></script>
+  <script>
+    // ─── State ──────────────────────────────────────────────────────────────
+    let currentType = 'feed';
+    let currentLayout = 'grid';
+    let currentTheme = 'dark';
+    let currentAccent = '#ff0033';
+
+    // ─── Type Buttons ────────────────────────────────────────────────────────
+    document.querySelectorAll('.type-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentType = btn.dataset.type;
+        updateFieldVisibility();
+      });
+    });
+
+    // ─── Layout Toggle ───────────────────────────────────────────────────────
+    document.querySelectorAll('.toggle-btn[data-layout]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.toggle-btn[data-layout]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentLayout = btn.dataset.layout;
+      });
+    });
+
+    // ─── Theme Toggle ────────────────────────────────────────────────────────
+    document.querySelectorAll('.toggle-btn[data-theme]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.toggle-btn[data-theme]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentTheme = btn.dataset.theme;
+      });
+    });
+
+    // ─── Accent / Button Color ───────────────────────────────────────────────
+    document.getElementById('cfg-accent').addEventListener('input', e => {
+      currentAccent = e.target.value;
+      document.querySelectorAll('.preset-color').forEach(b => b.classList.remove('active'));
+    });
+
+    document.querySelectorAll('.preset-color').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentAccent = btn.dataset.color;
+        document.getElementById('cfg-accent').value = currentAccent;
+        document.querySelectorAll('.preset-color').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // ─── Button Text Color Presets ───────────────────────────────────────────
+    document.querySelectorAll('.preset-btn-text').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById('cfg-btn-text').value = btn.dataset.color;
+        document.querySelectorAll('.preset-btn-text').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // ─── Use Sample Banner Button ───────────────────────────────────────────
+    document.getElementById('btn-use-template-img').addEventListener('click', () => {
+      document.getElementById('cfg-offline-img').value = 'offline-banner.jpg';
+    });
+
+    // ─── Max Results Slider ──────────────────────────────────────────────────
+    document.getElementById('cfg-max').addEventListener('input', e => {
+      document.getElementById('max-badge').textContent = e.target.value;
+    });
+
+    // ─── Field Visibility ────────────────────────────────────────────────────
+    function updateFieldVisibility() {
+      const isSingle = currentType === 'single';
+      const isPlaylist = currentType === 'playlist';
+      const isLive = currentType === 'live';
+      const isStats = currentType === 'stats';
+      const isFeedOrPlaylist = currentType === 'feed' || currentType === 'playlist';
+
+      document.getElementById('field-channel').style.display = isSingle ? 'none' : '';
+      document.getElementById('field-playlist').style.display = isPlaylist ? '' : 'none';
+      document.getElementById('field-video').style.display = isSingle ? '' : 'none';
+      document.getElementById('field-layout').style.display = (isStats || isSingle || isLive) ? 'none' : '';
+      document.getElementById('field-maxresults').style.display = (isStats || isSingle || isLive) ? 'none' : '';
+      document.getElementById('field-loadmore').style.display = isFeedOrPlaylist ? '' : 'none';
+      document.getElementById('field-loadmoretext').style.display = isFeedOrPlaylist ? '' : 'none';
+      document.getElementById('field-channelheader').style.display = (isSingle || isLive) ? 'none' : '';
+      document.getElementById('field-offline-message').style.display = isLive ? '' : 'none';
+      document.getElementById('field-offline-image').style.display = isLive ? '' : 'none';
+      document.getElementById('field-showlastvideo').style.display = isLive ? '' : 'none';
+    }
+
+    // ─── Run Preview ─────────────────────────────────────────────────────────
+    async function runPreview() {
+      const btn = document.getElementById('btn-preview');
+      const target = document.getElementById('yt-preview-target');
+      const empty = document.getElementById('empty-state');
+      const embedSection = document.getElementById('embed-section');
+
+      const proxyUrl  = document.getElementById('cfg-proxyurl').value.trim();
+      const apiKey    = document.getElementById('cfg-apikey').value.trim();
+      const channelId  = document.getElementById('cfg-channelid').value.trim();
+      const playlistId = document.getElementById('cfg-playlistid').value.trim();
+      const videoId   = document.getElementById('cfg-videoid').value.trim();
+      const maxResults = document.getElementById('cfg-max').value;
+      const showChannelInfo = document.getElementById('cfg-channelheader').checked;
+      const offlineMsg  = document.getElementById('cfg-offline-msg').value.trim();
+      const offlineImg  = document.getElementById('cfg-offline-img').value.trim();
+      const showLastVideo = document.getElementById('cfg-showlastvideo').checked;
+      const enableLoadMore = document.getElementById('cfg-loadmore').checked;
+      const loadMoreText   = document.getElementById('cfg-loadmore-text').value.trim();
+
+      // Color Customization values
+      const btnTextColor = document.getElementById('cfg-btn-text').value;
+      const bgColor = document.getElementById('cfg-bg-color').value;
+      const cardBgColor = document.getElementById('cfg-card-bg').value;
+      const textColor = document.getElementById('cfg-text-color').value;
+
+      if (!proxyUrl && !apiKey) {
+        shakeField('cfg-proxyurl');
+        shakeField('cfg-apikey');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<div class="btn-spinner"></div> Loading...`;
+
+      // Show preview area
+      empty.style.display = 'none';
+      target.style.display = 'block';
+      target.innerHTML = '';
+
+      // Set data attributes
+      target.removeAttribute('data-yt-widget');
+      target.setAttribute('data-yt-widget', '');
+      if (proxyUrl) {
+        target.setAttribute('data-proxy-url', proxyUrl);
+        target.removeAttribute('data-api-key');
+      } else {
+        target.setAttribute('data-api-key', apiKey);
+        target.removeAttribute('data-proxy-url');
+      }
+      target.setAttribute('data-type', currentType);
+      target.setAttribute('data-layout', currentLayout);
+      target.setAttribute('data-theme', currentTheme);
+      target.setAttribute('data-accent-color', currentAccent);
+      if (btnTextColor !== '#ffffff') target.setAttribute('data-button-text-color', btnTextColor);
+      else target.removeAttribute('data-button-text-color');
+      if (bgColor !== '#0f0f13') target.setAttribute('data-bg-color', bgColor);
+      else target.removeAttribute('data-bg-color');
+      if (cardBgColor !== '#1a1a24') target.setAttribute('data-card-bg-color', cardBgColor);
+      else target.removeAttribute('data-card-bg-color');
+      if (textColor !== '#f0f0f0') target.setAttribute('data-text-color', textColor);
+      else target.removeAttribute('data-text-color');
+
+      target.setAttribute('data-max-results', maxResults);
+      target.setAttribute('data-show-channel-info', showChannelInfo);
+
+      // Feed & Playlist Load More
+      if (currentType === 'feed' || currentType === 'playlist') {
+        target.setAttribute('data-load-more', enableLoadMore);
+        if (loadMoreText && loadMoreText !== 'Load More Videos') {
+          target.setAttribute('data-load-more-text', loadMoreText);
+        } else {
+          target.removeAttribute('data-load-more-text');
+        }
+      } else {
+        target.removeAttribute('data-load-more');
+        target.removeAttribute('data-load-more-text');
+      }
+
+      // Live-specific
+      if (currentType === 'live') {
+        if (offlineMsg && offlineMsg !== "We're not live right now")
+          target.setAttribute('data-offline-message', offlineMsg);
+        else
+          target.removeAttribute('data-offline-message');
+
+        if (offlineImg)
+          target.setAttribute('data-offline-image', offlineImg);
+        else
+          target.removeAttribute('data-offline-image');
+
+        target.setAttribute('data-show-last-video', showLastVideo);
+      } else {
+        target.removeAttribute('data-offline-message');
+        target.removeAttribute('data-offline-image');
+        target.removeAttribute('data-show-last-video');
+      }
+
+      if (channelId) target.setAttribute('data-channel-id', channelId);
+      else target.removeAttribute('data-channel-id');
+
+      if (playlistId) target.setAttribute('data-playlist-id', playlistId);
+      else target.removeAttribute('data-playlist-id');
+
+      if (videoId) target.setAttribute('data-video-id', videoId);
+      else target.removeAttribute('data-video-id');
+
+      // Reset classes
+      target.className = '';
+
+      // Run widget
+      try {
+        await window.YTWidget.init(target);
+      } catch (e) {
+        console.error(e);
+      }
+
+      // Generate embed code
+      const embedCode = generateEmbedCode({ proxyUrl, apiKey, channelId, playlistId, videoId, maxResults, showChannelInfo, offlineMsg, offlineImg, showLastVideo, btnTextColor, bgColor, cardBgColor, textColor, enableLoadMore, loadMoreText });
+      document.getElementById('embed-code').textContent = embedCode;
+      embedSection.style.display = 'block';
+
+      btn.disabled = false;
+      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><polygon points="5,3 19,12 5,21"/></svg> Generate Preview`;
+
+      // Scroll to preview
+      document.getElementById('yt-preview-target').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // ─── Generate Embed Code ─────────────────────────────────────────────────
+    function generateEmbedCode({ proxyUrl, apiKey, channelId, playlistId, videoId, maxResults, showChannelInfo, offlineMsg, offlineImg, showLastVideo, btnTextColor, bgColor, cardBgColor, textColor, enableLoadMore, loadMoreText }) {
+      const useProxy = !!proxyUrl;
+      const isLive = currentType === 'live';
+      const isFeedOrPlaylist = currentType === 'feed' || currentType === 'playlist';
+      const attrs = ['data-yt-widget'];
+
+      if (useProxy) {
+        attrs.push(`data-proxy-url="${proxyUrl}"`);
+      } else {
+        attrs.push(`data-api-key="${apiKey}"`);
+      }
+
+      if (currentType !== 'feed') attrs.push(`data-type="${currentType}"`);
+      if (channelId && currentType !== 'single') attrs.push(`data-channel-id="${channelId}"`);
+      if (playlistId && currentType === 'playlist') attrs.push(`data-playlist-id="${playlistId}"`);
+      if (videoId && currentType === 'single') attrs.push(`data-video-id="${videoId}"`);
+      if (currentLayout !== 'grid' && !isLive && currentType !== 'stats' && currentType !== 'single') attrs.push(`data-layout="${currentLayout}"`);
+      if (currentTheme !== 'dark') attrs.push(`data-theme="${currentTheme}"`);
+      if (currentAccent !== '#ff0033') attrs.push(`data-accent-color="${currentAccent}"`);
+      if (btnTextColor && btnTextColor !== '#ffffff') attrs.push(`data-button-text-color="${btnTextColor}"`);
+      if (bgColor && bgColor !== '#0f0f13') attrs.push(`data-bg-color="${bgColor}"`);
+      if (cardBgColor && cardBgColor !== '#1a1a24') attrs.push(`data-card-bg-color="${cardBgColor}"`);
+      if (textColor && textColor !== '#f0f0f0') attrs.push(`data-text-color="${textColor}"`);
+
+      if (maxResults !== '9' && !isLive && currentType !== 'stats' && currentType !== 'single') attrs.push(`data-max-results="${maxResults}"`);
+      if (isFeedOrPlaylist && !enableLoadMore) attrs.push('data-load-more="false"');
+      if (isFeedOrPlaylist && loadMoreText && loadMoreText !== 'Load More Videos') attrs.push(`data-load-more-text="${loadMoreText}"`);
+      if (!showChannelInfo && !isLive && currentType !== 'single') attrs.push(`data-show-channel-info="false"`);
+      if (isLive && offlineMsg && offlineMsg !== "We're not live right now") attrs.push(`data-offline-message="${offlineMsg}"`);
+      if (isLive && offlineImg) attrs.push(`data-offline-image="${offlineImg}"`);
+      if (isLive && !showLastVideo) attrs.push(`data-show-last-video="false"`);
+
+      const attrStr = attrs.map((a, i) => i === 0 ? a : `  ${a}`).join('\n');
+      const modeComment = useProxy
+        ? '<!-- YT Widget | Secure mode: API key hidden server-side 🔒 -->'
+        : '<!-- YT Widget | Direct mode: restrict API key to your domain -->';
+      return `${modeComment}\n<div\n  ${attrStr}>\n</div>\n\n<!-- Place this script before </body> -->\n<script src="yt-widget.js"><\/script>`;
+    }
+
+    // ─── Copy Embed ──────────────────────────────────────────────────────────
+    function copyEmbed() {
+      const code = document.getElementById('embed-code').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = document.getElementById('btn-copy');
+        btn.innerHTML = `✓ Copied!`;
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Code`;
+          btn.classList.remove('copied');
+        }, 2500);
+      });
+    }
+
+    // ─── Shake Invalid Field ─────────────────────────────────────────────────
+    function shakeField(id) {
+      const el = document.getElementById(id);
+      el.classList.add('shake');
+      el.focus();
+      setTimeout(() => el.classList.remove('shake'), 600);
+    }
+
+    // ─── Enter Key on Inputs ─────────────────────────────────────────────────
+    // ─── Dim API key field when proxy URL is filled ──────────────────────────
+    document.getElementById('cfg-proxyurl').addEventListener('input', e => {
+      const apiKeyGroup = document.getElementById('cfg-apikey').closest('.field-group');
+      const divider = document.querySelector('.field-divider');
+      const hasproxy = !!e.target.value.trim();
+      apiKeyGroup.style.opacity = hasproxy ? '0.4' : '';
+      apiKeyGroup.style.pointerEvents = hasproxy ? 'none' : '';
+      divider.style.opacity = hasproxy ? '0.4' : '';
+    });
+
+    document.querySelectorAll('.field-input').forEach(input => {
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') runPreview();
+      });
+    });
+
+    // Init
+    updateFieldVisibility();
+  </script>
+</body>
+</html>
