@@ -156,11 +156,36 @@
 
       <!-- Layout (for feed/playlist) -->
       <div class="field-group" id="field-layout">
-        <label class="field-label">Layout</label>
+        <label class="field-label">Card Layout</label>
         <div class="toggle-group">
           <button class="toggle-btn active" data-layout="grid" id="layout-grid">⊞ Grid</button>
           <button class="toggle-btn" data-layout="list" id="layout-list">☰ List</button>
         </div>
+      </div>
+
+      <!-- Desktop Columns (Grid mode only) -->
+      <div class="field-group" id="field-desktopcols">
+        <label class="field-label">Desktop Grid Columns</label>
+        <div class="toggle-group">
+          <button class="toggle-btn" data-cols="2" id="cols-2">2 Cols</button>
+          <button class="toggle-btn active" data-cols="3" id="cols-3">3 Cols (Default)</button>
+          <button class="toggle-btn" data-cols="4" id="cols-4">4 Cols</button>
+          <button class="toggle-btn" data-cols="5" id="cols-5">5 Cols</button>
+        </div>
+        <div class="field-hint">📱 Mobile phones auto-scale to 1 or 2 columns automatically.</div>
+      </div>
+
+      <!-- Content Max Width -->
+      <div class="field-group" id="field-maxwidth">
+        <label class="field-label" for="cfg-maxwidth">Desktop Container Max-Width</label>
+        <input type="text" id="cfg-maxwidth" class="field-input" placeholder="e.g. 100%, 1200px, 1000px" value="100%">
+        <div class="color-presets" style="margin-top:6px; gap:6px">
+          <button type="button" class="btn-use-template" onclick="document.getElementById('cfg-maxwidth').value='100%'">100% (Full)</button>
+          <button type="button" class="btn-use-template" onclick="document.getElementById('cfg-maxwidth').value='1200px'">1200px</button>
+          <button type="button" class="btn-use-template" onclick="document.getElementById('cfg-maxwidth').value='1000px'">1000px</button>
+          <button type="button" class="btn-use-template" onclick="document.getElementById('cfg-maxwidth').value='800px'">800px</button>
+        </div>
+        <div class="field-hint">Constrains widget max-width on desktop. Auto-centered.</div>
       </div>
 
       <!-- Theme -->
@@ -288,6 +313,13 @@
           📐 <strong>Recommended Size:</strong> 16:9 ratio — <strong>1920×1080 px</strong> or <strong>1280×720 px</strong>.<br>
           We included a sample <code>offline-banner.jpg</code> in your project folder!
         </div>
+      </div>
+
+      <div class="field-group" id="field-offline-image-size" style="display:none">
+        <label class="field-label" for="cfg-offline-img-width">Offline Image Width <span class="count-badge" id="offline-img-width-badge">100%</span></label>
+        <input type="range" id="cfg-offline-img-width" class="range-input" min="40" max="100" value="100">
+        <div class="range-labels"><span>40%</span><span>100%</span></div>
+        <div class="field-hint">Reduce the banner width if you want the offline image to sit inside the card instead of filling the full row.</div>
       </div>
 
       <!-- Show Last Video (live type only) -->
@@ -450,6 +482,7 @@
     // ─── State ──────────────────────────────────────────────────────────────
     let currentType = 'feed';
     let currentLayout = 'grid';
+    let currentCols = '3';
     let currentTheme = 'dark';
     let currentAccent = '#ff0033';
 
@@ -469,6 +502,16 @@
         document.querySelectorAll('.toggle-btn[data-layout]').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentLayout = btn.dataset.layout;
+        updateFieldVisibility();
+      });
+    });
+
+    // ─── Desktop Columns Toggle ─────────────────────────────────────────────
+    document.querySelectorAll('.toggle-btn[data-cols]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.toggle-btn[data-cols]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentCols = btn.dataset.cols;
       });
     });
 
@@ -515,6 +558,10 @@
       document.getElementById('max-badge').textContent = e.target.value;
     });
 
+    document.getElementById('cfg-offline-img-width').addEventListener('input', e => {
+      document.getElementById('offline-img-width-badge').textContent = `${e.target.value}%`;
+    });
+
     // ─── Field Visibility ────────────────────────────────────────────────────
     function updateFieldVisibility() {
       const isSingle = currentType === 'single';
@@ -533,7 +580,10 @@
       document.getElementById('field-channelheader').style.display = (isSingle || isLive) ? 'none' : '';
       document.getElementById('field-offline-message').style.display = isLive ? '' : 'none';
       document.getElementById('field-offline-image').style.display = isLive ? '' : 'none';
+      document.getElementById('field-offline-image-size').style.display = isLive ? '' : 'none';
       document.getElementById('field-showlastvideo').style.display = isLive ? '' : 'none';
+      document.getElementById('field-desktopcols').style.display = (currentLayout === 'grid' && !isStats && !isSingle && !isLive) ? '' : 'none';
+      document.getElementById('field-maxwidth').style.display = 'block';
     }
 
     // ─── Run Preview ─────────────────────────────────────────────────────────
@@ -552,9 +602,12 @@
       const showChannelInfo = document.getElementById('cfg-channelheader').checked;
       const offlineMsg  = document.getElementById('cfg-offline-msg').value.trim();
       const offlineImg  = document.getElementById('cfg-offline-img').value.trim();
+      const offlineImgWidth = document.getElementById('cfg-offline-img-width').value.trim();
       const showLastVideo = document.getElementById('cfg-showlastvideo').checked;
       const enableLoadMore = document.getElementById('cfg-loadmore').checked;
       const loadMoreText   = document.getElementById('cfg-loadmore-text').value.trim();
+      const desktopCols    = currentCols;
+      const maxWidth       = document.getElementById('cfg-maxwidth').value.trim();
 
       // Color Customization values
       const btnTextColor = document.getElementById('cfg-btn-text').value;
@@ -599,6 +652,18 @@
       if (textColor !== '#f0f0f0') target.setAttribute('data-text-color', textColor);
       else target.removeAttribute('data-text-color');
 
+      if (currentLayout === 'grid' && desktopCols && desktopCols !== '3') {
+        target.setAttribute('data-columns', desktopCols);
+      } else {
+        target.removeAttribute('data-columns');
+      }
+
+      if (maxWidth && maxWidth !== '100%') {
+        target.setAttribute('data-max-width', maxWidth);
+      } else {
+        target.removeAttribute('data-max-width');
+      }
+
       target.setAttribute('data-max-results', maxResults);
       target.setAttribute('data-show-channel-info', showChannelInfo);
 
@@ -627,10 +692,16 @@
         else
           target.removeAttribute('data-offline-image');
 
+        if (offlineImgWidth && offlineImgWidth !== '100')
+          target.setAttribute('data-offline-image-width', `${offlineImgWidth}%`);
+        else
+          target.removeAttribute('data-offline-image-width');
+
         target.setAttribute('data-show-last-video', showLastVideo);
       } else {
         target.removeAttribute('data-offline-message');
         target.removeAttribute('data-offline-image');
+        target.removeAttribute('data-offline-image-width');
         target.removeAttribute('data-show-last-video');
       }
 
@@ -654,7 +725,7 @@
       }
 
       // Generate embed code
-      const embedCode = generateEmbedCode({ proxyUrl, apiKey, channelId, playlistId, videoId, maxResults, showChannelInfo, offlineMsg, offlineImg, showLastVideo, btnTextColor, bgColor, cardBgColor, textColor, enableLoadMore, loadMoreText });
+      const embedCode = generateEmbedCode({ proxyUrl, apiKey, channelId, playlistId, videoId, maxResults, showChannelInfo, offlineMsg, offlineImg, offlineImgWidth, showLastVideo, btnTextColor, bgColor, cardBgColor, textColor, enableLoadMore, loadMoreText, desktopCols, maxWidth });
       document.getElementById('embed-code').textContent = embedCode;
       embedSection.style.display = 'block';
 
@@ -666,7 +737,7 @@
     }
 
     // ─── Generate Embed Code ─────────────────────────────────────────────────
-    function generateEmbedCode({ proxyUrl, apiKey, channelId, playlistId, videoId, maxResults, showChannelInfo, offlineMsg, offlineImg, showLastVideo, btnTextColor, bgColor, cardBgColor, textColor, enableLoadMore, loadMoreText }) {
+    function generateEmbedCode({ proxyUrl, apiKey, channelId, playlistId, videoId, maxResults, showChannelInfo, offlineMsg, offlineImg, offlineImgWidth, showLastVideo, btnTextColor, bgColor, cardBgColor, textColor, enableLoadMore, loadMoreText, desktopCols, maxWidth }) {
       const useProxy = !!proxyUrl;
       const isLive = currentType === 'live';
       const isFeedOrPlaylist = currentType === 'feed' || currentType === 'playlist';
@@ -683,6 +754,8 @@
       if (playlistId && currentType === 'playlist') attrs.push(`data-playlist-id="${playlistId}"`);
       if (videoId && currentType === 'single') attrs.push(`data-video-id="${videoId}"`);
       if (currentLayout !== 'grid' && !isLive && currentType !== 'stats' && currentType !== 'single') attrs.push(`data-layout="${currentLayout}"`);
+      if (currentLayout === 'grid' && desktopCols && desktopCols !== '3' && !isLive && currentType !== 'stats' && currentType !== 'single') attrs.push(`data-columns="${desktopCols}"`);
+      if (maxWidth && maxWidth !== '100%') attrs.push(`data-max-width="${maxWidth}"`);
       if (currentTheme !== 'dark') attrs.push(`data-theme="${currentTheme}"`);
       if (currentAccent !== '#ff0033') attrs.push(`data-accent-color="${currentAccent}"`);
       if (btnTextColor && btnTextColor !== '#ffffff') attrs.push(`data-button-text-color="${btnTextColor}"`);
@@ -696,6 +769,7 @@
       if (!showChannelInfo && !isLive && currentType !== 'single') attrs.push(`data-show-channel-info="false"`);
       if (isLive && offlineMsg && offlineMsg !== "We're not live right now") attrs.push(`data-offline-message="${offlineMsg}"`);
       if (isLive && offlineImg) attrs.push(`data-offline-image="${offlineImg}"`);
+      if (isLive && offlineImgWidth && offlineImgWidth !== '100') attrs.push(`data-offline-image-width="${offlineImgWidth}%"`);
       if (isLive && !showLastVideo) attrs.push(`data-show-last-video="false"`);
 
       const attrStr = attrs.map((a, i) => i === 0 ? a : `  ${a}`).join('\n');

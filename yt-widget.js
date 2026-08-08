@@ -19,6 +19,7 @@
  *   data-show-channel-info  — "true" | "false" (default: "true")
  *   data-accent-color       — CSS color string (default: "#ff0033")
  *   data-offline-message    — Custom text shown when not live (default: "We're not live right now")
+ *   data-offline-image-width — Width of offline banner image, e.g. "70%" (default: "100%")
  *   data-show-last-video    — "true"|"false" show last upload in offline card (default: "true")
  *
  * Proxy Mode Example (API key stays on server — RECOMMENDED):
@@ -137,7 +138,7 @@
     /* ── Grid Layout ── */
     .ytw-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      grid-template-columns: repeat(var(--ytw-cols, 3), minmax(0, 1fr));
       gap: 16px;
     }
     .ytw-card {
@@ -348,8 +349,8 @@
       padding: 0 0 36px 0; overflow: hidden;
     }
     .ytw-offline-banner {
-      position: relative; width: 100%; padding-top: 56.25%; /* 16:9 ratio */
-      background: #000; overflow: hidden; margin-bottom: 24px;
+      position: relative; width: min(100%, var(--ytw-offline-banner-width, 100%)); padding-top: 56.25%; /* 16:9 ratio */
+      background: #000; overflow: hidden; margin: 0 auto 24px; border-radius: 18px;
     }
     .ytw-offline-banner img {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -925,10 +926,14 @@
   }
 
   // ─── Render: Offline Card ────────────────────────────────────────────────────
-  function renderOffline(channel, lastVideo, offlineMessage, showLastVideo, offlineImage) {
+  function renderOffline(channel, lastVideo, offlineMessage, showLastVideo, offlineImage, offlineImageWidth) {
     const channelUrl = channel?.customUrl
       ? `https://www.youtube.com/${channel.customUrl}`
       : `https://www.youtube.com/channel/${channel?.id || ''}`;
+
+    const offlineBannerStyle = offlineImage && offlineImageWidth
+      ? ` style="--ytw-offline-banner-width:${escapeHtml(offlineImageWidth)};"`
+      : '';
 
     const lastVideoHtml = (showLastVideo && lastVideo) ? `
       <div class="ytw-offline-last">
@@ -953,7 +958,7 @@
       <div class="ytw-offline-card">
         <div class="ytw-offline-hero ${offlineImage ? 'ytw-has-image' : ''}">
           ${offlineImage ? `
-            <div class="ytw-offline-banner">
+            <div class="ytw-offline-banner"${offlineBannerStyle}>
               <img src="${offlineImage}" alt="Offline Banner" loading="lazy">
               <div class="ytw-offline-banner-overlay"></div>
             </div>
@@ -1017,11 +1022,30 @@
     const textColor       = d.textColor       || d.text_color       || '';
     const textMutedColor  = d.textMutedColor  || d.text_muted_color  || '';
 
+    const desktopCols = d.columns || d.cols || d.desktopCols || '';
+    const maxWidth    = d.maxWidth || d.max_width || d.width || '';
+
     // Apply theme class
     el.classList.add('ytw-root');
     if (theme === 'light') el.classList.add('ytw-light');
     if (accentColor) el.style.setProperty('--ytw-accent', accentColor);
     if (buttonBgColor) el.style.setProperty('--ytw-btn-bg', buttonBgColor);
+
+    if (desktopCols) {
+      el.style.setProperty('--ytw-cols', desktopCols);
+    } else {
+      el.style.removeProperty('--ytw-cols');
+    }
+
+    if (maxWidth) {
+      el.style.maxWidth = maxWidth;
+      el.style.marginLeft = 'auto';
+      el.style.marginRight = 'auto';
+    } else {
+      el.style.maxWidth = '';
+      el.style.marginLeft = '';
+      el.style.marginRight = '';
+    }
 
     if (!buttonTextColor && (buttonBgColor || accentColor)) {
       buttonTextColor = getContrastColor(buttonBgColor || accentColor);
@@ -1046,6 +1070,7 @@
 
     const offlineMessage = d.offlineMessage || d.offline_message || "We're not live right now";
     const offlineImage   = d.offlineImage   || d.offline_image   || null;
+    const offlineImageWidth = d.offlineImageWidth || d.offline_image_width || null;
     const showLastVideo  = d.showLastVideo !== 'false' && d.show_last_video !== 'false';
 
     try {
@@ -1073,7 +1098,7 @@
               lastVideo = lastVids?.[0] || null;
             } catch (_) { /* non-fatal */ }
           }
-          html = renderOffline(channel, lastVideo, offlineMessage, showLastVideo, offlineImage);
+          html = renderOffline(channel, lastVideo, offlineMessage, showLastVideo, offlineImage, offlineImageWidth);
         }
 
       } else if (type === 'single') {

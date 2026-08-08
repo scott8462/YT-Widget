@@ -94,6 +94,8 @@ All widget settings are set via HTML `data-` attributes:
 | `data-video-id` | `xxxxxxxxx` | *Single mode* | YouTube Video ID |
 | `data-type` | `feed` \| `live` \| `playlist` \| `stats` \| `single` | `feed` | Display mode |
 | `data-layout` | `grid` \| `list` | `grid` | Video layout format |
+| `data-columns` | `2` \| `3` \| `4` \| `5` | `3` | Desktop grid column count (Phones stay responsive) |
+| `data-max-width` | CSS width (`100%`, `1200px`, `1000px`, `800px`) | `100%` | Desktop container max-width |
 | `data-theme` | `dark` \| `light` | `dark` | Base color theme |
 | `data-accent-color` | CSS Hex/RGB | `#ff0033` | Button background & accent highlight color |
 | `data-button-text-color` | CSS Hex/RGB | *Auto-Contrast* | Text color for buttons |
