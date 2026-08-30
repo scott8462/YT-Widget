@@ -1,5 +1,5 @@
 # YT Widget — Free Open-Source YouTube Website Embed
-
+[![GitHub Downloads](https://shields.io)](https://github.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com)
 [![Dependencies](https://img.shields.io/badge/dependencies-zero-brightgreen.svg)](yt-widget.js)
